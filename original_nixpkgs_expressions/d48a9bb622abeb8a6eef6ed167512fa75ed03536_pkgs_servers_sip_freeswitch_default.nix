@@ -24,10 +24,6 @@
 , SystemConfiguration
 , modules ? null
 , nixosTests
-, debug ? false
-, erlang
-, spandsp3
-, curl
 }:
 
 let
@@ -94,8 +90,6 @@ defaultModules = mods: with mods; [
   xml_int.cdr
   xml_int.rpc
   xml_int.scgi
-  event_handlers.erlang_event
-  event_handlers.kazoo
 ] ++ lib.optionals stdenv.isLinux [ endpoints.gsmopen ];
 
 enabledModules = (if modules != null then modules else defaultModules) availableModules;
@@ -114,16 +108,8 @@ stdenv.mkDerivation rec {
     owner = "signalwire";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-LzGqrXzPED3PoCDnrwUmmSQsvlAucYo2gTkwFausM7A=";
+    hash = "sha256-LzGqrXzPED3PoCDnrwUmmSQsvlAucYo2gTkwFausM7A=";
   };
-
-  dontStrip = debug;
-  separateDebugInfo = debug;
-
-  patches = [
-    ./patches/1338.patch
-    ./patches/patch_kazoo_ei_utils.patch
-  ];
 
   postPatch = ''
     patchShebangs     libs/libvpx/build/make/rtcd.pl
@@ -142,14 +128,12 @@ stdenv.mkDerivation rec {
   strictDeps = true;
   nativeBuildInputs = [
     pkg-config autoreconfHook perl which yasm
-  ]
-  ++ lib.unique (lib.concatMap (mod: mod.nativeInputs) enabledModules);
+  ];
   buildInputs = [
     openssl ncurses gnutls readline libjpeg
     sqlite pcre speex ldns libedit
     libsndfile libtiff
     libuuid libxcrypt
-    spandsp3 curl
   ]
   ++ lib.unique (lib.concatMap (mod: mod.inputs) enabledModules)
   ++ lib.optionals stdenv.isDarwin [ SystemConfiguration ];
@@ -171,16 +155,6 @@ stdenv.mkDerivation rec {
     cp "${modulesConf}" modules.conf
   '';
 
-  buildPhase = ''
-    make core
-    make iksemel-dep
-    make -C libs/esl perlmod
-  '';
-
-  installPhase = ''
-    make install
-    make DESTDIR=$out PERL_SITEDIR=/lib/perl -C libs/esl perlmod-install
-  '';
   postInstall = ''
     # helper for compiling modules... not generally useful; also pulls in perl dependency
     rm "$out"/bin/fsxs
@@ -194,7 +168,7 @@ stdenv.mkDerivation rec {
     description = "Cross-Platform Scalable FREE Multi-Protocol Soft Switch";
     homepage = "https://freeswitch.org/";
     license = lib.licenses.mpl11;
-    maintainers = with lib.maintainers; [ ];
+    maintainers = with lib.maintainers; [ mikaelfangel ];
     platforms = with lib.platforms; unix;
     broken = stdenv.isDarwin;
   };
