@@ -166,7 +166,21 @@ in
     json_cdr         = mk "event_handlers/mod_json_cdr"            [ ]                                     [ ];
     radius_cdr       = mk "event_handlers/mod_radius_cdr"          [ ]                                     [ ];
     odbc_cdr         = mk "event_handlers/mod_odbc_cdr"            [ ]                                     [ ];
-    kazoo            = mk "event_handlers/mod_kazoo"               [ ]                                     [ erlang ];
+  # mod_kazoo has been removed from the FreeSWITCH repo
+  # see https://github.com/freeswitch/mod_kazoo
+  #
+  # TODO/QUESTION Isn't deps pulled in during FreeSWITCH build problematic?
+  #
+  #               Every FreeSWITCH module is compiled  from  their
+  #               source either in the FreeSWITCH repo  or  pulled
+  #               in via  the  `modules.conf`  syntax  below,  but
+  #               modules can be compiled and added  afterward  as
+  #               well.   FreeSWITCH   can   also   be   compoiled
+  #               **without** any modules too. Therefore, it would
+  #               probably me  more  prudent  for  modules  to  be
+  #               treated separately from FreeSWITCH  itself,  and
+  #               link them as needed.
+    kazoo            = mk "mod_kazoo|https://github.com/freeswitch/mod_kazoo.git -b master" [ ]            [ erlang ];
     rayo             = mk "event_handlers/mod_rayo"                [ ]                                     [ ];
     smpp             = mk "event_handlers/mod_smpp"                [ ]                                     [ ];
     snmp             = mk "event_handlers/mod_snmp"                [ ]                                     [ ];
@@ -178,7 +192,7 @@ in
     imagick          = mk "formats/mod_imagick"                    [ ]                                     [ ];
     local_stream     = mk "formats/mod_local_stream"               [ ]                                     [ ];
     native_file      = mk "formats/mod_native_file"                [ ]                                     [ ];
-    opusfile         = mk "formats/mod_opusfile"                   [ libopus opusfile libopusenc libogg ];
+    opusfile         = mk "formats/mod_opusfile"                   [ libopus opusfile libopusenc libogg ]  [ ];
     png              = mk "formats/mod_png"                        [ ]                                     [ ];
     portaudio_stream = mk "formats/mod_portaudio_stream"           [ ]                                     [ ];
     shell_stream     = mk "formats/mod_shell_stream"               [ ]                                     [ ];

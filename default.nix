@@ -22,12 +22,12 @@
 , libxcrypt
 , callPackage
 , SystemConfiguration
+# Needs to be a function along the lines of:
+# mods: [ ... list of modules corresponding to the modules in the modules.nix file ... ]
+# (see `defaultModules` below)
 , modules ? null
 , nixosTests
 , debug ? false
-, erlang
-, spandsp3
-, curl
 }:
 
 let
@@ -95,7 +95,8 @@ defaultModules = mods: with mods; [
   xml_int.rpc
   xml_int.scgi
   event_handlers.erlang_event
-  event_handlers.kazoo
+# See note in modules.nix about mod_kazoo
+# event_handlers.kazoo
 ] ++ lib.optionals stdenv.isLinux [ endpoints.gsmopen ];
 
 enabledModules = (if modules != null then modules else defaultModules) availableModules;
@@ -120,10 +121,11 @@ stdenv.mkDerivation rec {
   dontStrip = debug;
   separateDebugInfo = debug;
 
-  patches = [
-    ./patches/1338.patch
-    ./patches/patch_kazoo_ei_utils.patch
-  ];
+  # mod_kazoo patches
+  # patches = [
+  #   ./patches/1338.patch
+  #   ./patches/patch_kazoo_ei_utils.patch
+  # ];
 
   postPatch = ''
     patchShebangs     libs/libvpx/build/make/rtcd.pl
@@ -149,7 +151,6 @@ stdenv.mkDerivation rec {
     sqlite pcre speex ldns libedit
     libsndfile libtiff
     libuuid libxcrypt
-    spandsp3 curl
   ]
   ++ lib.unique (lib.concatMap (mod: mod.inputs) enabledModules)
   ++ lib.optionals stdenv.isDarwin [ SystemConfiguration ];
