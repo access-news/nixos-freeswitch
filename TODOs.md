@@ -19,6 +19,16 @@ The NixOS Discourse post [Guidelines / best practices to package software with p
   >   commands available on the `freeswitch` console.  Not
   >   even sure if such a deployment could even be able to
   >   do anything functional?
+  >
+  > + `mod_sndfile`
+  >    From https://lists.freeswitch.org/pipermail/freeswitch-users/2010-November/064708.html
+  >    > It provides support for reading most of the sound file formats that FS
+  >    > supports. Almost anything that involves a sound file (e.g. voicemail,
+  >    > playback, IVR, record etc) requires it. It isn't necessary if you're
+  >    > just routing calls between endpoints, but anything more complex
+  >    > probably requires it.
+  >    >
+  >    > -Steve [Ayre]
 
 + The **in-tree** modules can be compiled with FreeSWITCH itself and then by themselves afterwards, but with Nix this is won't work because the Nix store is immutable. To add modules later, one will have to recompile the entire package again with new inputs.
 
